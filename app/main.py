@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.infrastructure.entry_point.routes import router
+from infrastructure.entry_point.routes import router
 
 def create_app() -> FastAPI:
     app = FastAPI(title="ChaplinPoopManager", version="0.1")

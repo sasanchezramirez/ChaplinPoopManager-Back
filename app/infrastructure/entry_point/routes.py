@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.infrastructure.entry_point.handler.get_poop_times_handler import get_poop_times_handler
+from infrastructure.entry_point.handler.get_poop_times_handler import get_poop_times_handler
 
 router = APIRouter()
 
