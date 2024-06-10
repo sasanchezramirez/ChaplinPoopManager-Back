@@ -1,10 +1,11 @@
+import logging
 from fastapi import APIRouter
-from infrastructure.entry_point.handler.get_poop_times_handler import get_poop_times_handler
+from infrastructure.entry_point.handler.save_poop_times_handler import save_poop_times_handler
 
 router = APIRouter()
 
 @router.get("/poop-times", description="Get how many times Chaplin went to the bathroom")
-async def get_poop_times():
+async def save_poop_times():
         """
         Endpoint to get the number of times Chaplin went to the bathroom.
 
@@ -13,4 +14,5 @@ async def get_poop_times():
         Returns:
             dict: JSON object with the details of chaplin's poop times.
         """
-        return get_poop_times_handler()
+        logging.info("Calling save_poop_times endpoint")
+        return save_poop_times_handler()

@@ -1,3 +1,4 @@
+import logging
 from fastapi import FastAPI
 from infrastructure.entry_point.routes import router
 
@@ -6,9 +7,9 @@ def create_app() -> FastAPI:
     app.include_router(router)
     return app
 
-
-
 app = create_app()
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 if __name__ == "__main__":
     import uvicorn

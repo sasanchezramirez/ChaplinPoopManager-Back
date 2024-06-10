@@ -1,2 +1,6 @@
+import logging
+
 def save_poop_times():
-    return "Hola, soy el persistence"
+    logging.info("Calling save_poop_times")
+
+    return True
