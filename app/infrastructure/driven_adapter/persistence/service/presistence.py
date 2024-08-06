@@ -5,6 +5,9 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.infrastructure.driven_adapter.persistence.entity.user_entity import User_entity
 from app.infrastructure.driven_adapter.persistence.repository.user_repository import UserRepository
 from app.domain.model.user import User
+from app.domain.model.poop import Poop
+from app.infrastructure.driven_adapter.persistence.repository.poop_repository import PoopRepository
+from app.infrastructure.driven_adapter.persistence.mapper.poop_mapper import map_poop_to_poop_entity
 from app.domain.gateway.persistence_gateway import PersistenceGateway
 from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.util.response_codes import ResponseCodeEnum
@@ -17,6 +20,7 @@ class Persistence(PersistenceGateway):
         logger.info("Init persistence service")
         self.session = session
         self.user_repository = UserRepository(session)
+        self.poop_repository = PoopRepository(session)
 
     def create_user(self, user: User):
         try:
@@ -68,5 +72,22 @@ class Persistence(PersistenceGateway):
             raise e
         except SQLAlchemyError as e:
             logger.error(f"Error updating user: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG02)
+    
+    def new_poop(self, poop: Poop):
+        try:
+            poop_entity = map_poop_to_poop_entity(poop)
+            created_poop_entity = self.poop_repository.new_poop(poop_entity)
+            self.session.commit()
+            if created_poop_entity:
+                return True
+            else:
+                raise CustomException(ResponseCodeEnum.KOG02)
+        except CustomException as e:
+            self.session.rollback()
+            raise e
+        except SQLAlchemyError as e:
+            logger.error(f"Error creating poop: {e}")
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
