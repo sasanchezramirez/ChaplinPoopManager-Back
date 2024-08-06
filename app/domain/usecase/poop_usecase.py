@@ -16,12 +16,11 @@ class PoopUseCase:
         self.persistence_gateway = persistence_gateway
         
 
-    def new_poop(self, poop: Poop):
+    async def new_poop(self, poop: Poop):
         logger.info("Init new poop usecase")
         poop.date = datetime.now().isoformat()
-        try:
-            # created_user = self.persistence_gateway.create_user(user)
-            return True
+        try:  
+            return self.persistence_gateway.new_poop(poop)
         except CustomException as e:
             logger.error(f"Custom exception: {e}")
             raise e
