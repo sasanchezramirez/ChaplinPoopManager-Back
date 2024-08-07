@@ -10,7 +10,7 @@ class NewPetInput(BaseModel):
 class GetUserPetsInput(BaseModel):
     user_id: int
 
-class GetPetInput(BaseModel):
+class GetPetsInput(BaseModel):
     pet_id: int
 
 class PetOutput(BaseModel):

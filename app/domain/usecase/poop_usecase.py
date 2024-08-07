@@ -6,7 +6,6 @@ from app.domain.model.poop import Poop, PoopList
 from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.util.response_codes import ResponseCodeEnum
 from app.domain.gateway.persistence_gateway import PersistenceGateway
-from app.domain.usecase.util.security import  hash_password
 
 logger = logging.getLogger("Poop UseCase")
 

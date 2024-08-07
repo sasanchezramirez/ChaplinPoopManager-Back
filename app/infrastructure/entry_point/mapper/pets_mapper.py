@@ -1,5 +1,5 @@
 from app.domain.model.pets import Pet, PetList
-from app.infrastructure.entry_point.dto.pets_dto import NewPetInput, GetUserPetsInput, GetPetInput, PetOutput, PetListOutput
+from app.infrastructure.entry_point.dto.pets_dto import NewPetInput, GetUserPetsInput, GetPetsInput, PetOutput, PetListOutput
 
 def map_pet_dto_to_pet(pet_dto: NewPetInput) -> Pet:
         return Pet(
@@ -17,7 +17,7 @@ def map_pet_to_pet_output_dto(pet: Pet) -> PetOutput:
                 birthday=pet.birthday,
                 profile_url=pet.profile_url
         )
-def map_get_pet_dto_to_pet(pet_dto: GetPetInput) -> Pet:
+def map_get_pet_dto_to_pet(pet_dto: GetPetsInput) -> Pet:
         return Pet(
             id=pet_dto.pet_id
         )
