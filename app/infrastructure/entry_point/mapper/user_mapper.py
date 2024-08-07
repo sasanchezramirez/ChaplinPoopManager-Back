@@ -1,4 +1,3 @@
-from datetime import datetime
 from app.domain.model.user import User
 from app.infrastructure.entry_point.dto.user_dto import NewUserInput, GetUser, UserOutput, LoginInput, UpdateUserInput
 
