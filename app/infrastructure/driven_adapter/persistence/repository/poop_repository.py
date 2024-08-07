@@ -25,4 +25,15 @@ class PoopRepository:
             logger.error(f"Operation failed: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
         
+    def get_poop_by_pet_id(self, poop_entity: PoopEntity):
+        logger.info(f"Getting poop times for pet id: {poop_entity.pet_id}")
+        try:
+            return self.session.query(PoopEntity).filter(PoopEntity.pet_id == poop_entity.pet_id).all()
+        except SQLAlchemyError as e:
+            logger.error(f"Operation failed: {e}")
+            raise CustomException(ResponseCodeEnum.KOG02)
+        except Exception as e:
+            logger.error(f"Operation failed: {e}")
+            raise CustomException(ResponseCodeEnum.KOG01)
+        
 

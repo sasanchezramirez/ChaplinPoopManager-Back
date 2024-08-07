@@ -7,7 +7,7 @@ from app.infrastructure.driven_adapter.persistence.repository.user_repository im
 from app.domain.model.user import User
 from app.domain.model.poop import Poop
 from app.infrastructure.driven_adapter.persistence.repository.poop_repository import PoopRepository
-from app.infrastructure.driven_adapter.persistence.mapper.poop_mapper import map_poop_to_poop_entity
+from app.infrastructure.driven_adapter.persistence.mapper.poop_mapper import map_poop_to_poop_entity, map_poop_entity_to_poop
 from app.domain.gateway.persistence_gateway import PersistenceGateway
 from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.util.response_codes import ResponseCodeEnum
@@ -89,5 +89,20 @@ class Persistence(PersistenceGateway):
             raise e
         except SQLAlchemyError as e:
             logger.error(f"Error creating poop: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG02)
+    
+    def get_poop_times_by_pet_id(self, poop: Poop):
+        try:
+            poop_times_list = []
+            poop_entity = map_poop_to_poop_entity(poop)
+            poop_times_list_entity = self.poop_repository.get_poop_by_pet_id(poop_entity)
+            for poop_times_entity in poop_times_list_entity:
+                poop_times_list.append(map_poop_entity_to_poop(poop_times_entity))
+            return poop_times_list
+        except CustomException as e:
+            raise e
+        except SQLAlchemyError as e:
+            logger.error(f"Error getting poop: {e}")
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)

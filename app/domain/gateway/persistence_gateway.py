@@ -24,5 +24,5 @@ class PersistenceGateway(ABC):
     def new_poop(self, poop: Poop):
         pass
 
-    def get_poop(self, poop: Poop):
+    def get_poop_times_by_pet_id(self, poop: Poop):
         pass

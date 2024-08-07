@@ -2,7 +2,7 @@ import logging
 
 
 from datetime import datetime
-from app.domain.model.poop import Poop
+from app.domain.model.poop import Poop, PoopList
 from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.util.response_codes import ResponseCodeEnum
 from app.domain.gateway.persistence_gateway import PersistenceGateway
@@ -31,7 +31,9 @@ class PoopUseCase:
     async def get_poop(self, poop: Poop):
         logger.info("Init get poop usecase")
         try:  
-            return self.persistence_gateway.get_poop(poop)
+            poop_times = self.persistence_gateway.get_poop_times_by_pet_id(poop)
+            poop_list = PoopList(poops=poop_times)
+            return poop_list
         except CustomException as e:
             logger.error(f"Custom exception: {e}")
             raise e

@@ -92,6 +92,7 @@ async def get_poop(
 
     try:
         poop_times = await poop_usecase.get_poop(get_poop)
+        logger.info(f"Poop times: {poop_times}")
         response_data = poop_mapper.map_poop_list_to_poop_list_output_dto(poop_times)
         return ApiResponse.create_response(ResponseCodeEnum.KO000, response_data)
     except CustomException as e:
