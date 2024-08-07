@@ -23,3 +23,6 @@ class PersistenceGateway(ABC):
     @abstractmethod
     def new_poop(self, poop: Poop):
         pass
+
+    def get_poop(self, poop: Poop):
+        pass

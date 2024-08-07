@@ -27,6 +27,17 @@ class PoopUseCase:
         except Exception as e:
             logger.error(f"Unhandled error: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
+        
+    async def get_poop(self, poop: Poop):
+        logger.info("Init get poop usecase")
+        try:  
+            return self.persistence_gateway.get_poop(poop)
+        except CustomException as e:
+            logger.error(f"Custom exception: {e}")
+            raise e
+        except Exception as e:
+            logger.error(f"Unhandled error: {e}")
+            raise CustomException(ResponseCodeEnum.KOG01)
 
         
 
