@@ -7,4 +7,4 @@ class PetsEntity(Base):
     pet_name = Column(String)
     user_id = Column(Integer)
     birthday = Column(Date)
-    profile_url = Column(String)
+    profile_image = Column(String)

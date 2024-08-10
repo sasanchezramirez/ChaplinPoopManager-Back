@@ -1,4 +1,5 @@
 import logging
+import app.infrastructure.driven_adapter.persistence.mapper.user_mapper as mapper
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError
@@ -11,7 +12,8 @@ from app.infrastructure.driven_adapter.persistence.mapper.poop_mapper import map
 from app.domain.gateway.persistence_gateway import PersistenceGateway
 from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.util.response_codes import ResponseCodeEnum
-import app.infrastructure.driven_adapter.persistence.mapper.user_mapper as mapper
+from app.infrastructure.driven_adapter.persistence.repository.pets_repository import PetsRepository
+from app.infrastructure.driven_adapter.persistence.mapper.pets_mapper import map_pet_to_pets_entity, map_pets_entity_to_pet
 
 logger = logging.getLogger("Persistence")
 
@@ -21,6 +23,7 @@ class Persistence(PersistenceGateway):
         self.session = session
         self.user_repository = UserRepository(session)
         self.poop_repository = PoopRepository(session)
+        self.pets_repository = PetsRepository(session)
 
     def create_user(self, user: User):
         try:
@@ -100,6 +103,20 @@ class Persistence(PersistenceGateway):
             for poop_times_entity in poop_times_list_entity:
                 poop_times_list.append(map_poop_entity_to_poop(poop_times_entity))
             return poop_times_list
+        except CustomException as e:
+            raise e
+        except SQLAlchemyError as e:
+            logger.error(f"Error getting poop: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG02)
+        
+    def get_pets_by_user_id(self, user_id: int):
+        try:
+            pets_list = []
+            pets_entity = self.pets_repository.get_pets_by_user_id(user_id)
+            for pets_entity in pets_entity:
+                pets_list.append(map_pets_entity_to_pet(pets_entity))
+            return pets_list
         except CustomException as e:
             raise e
         except SQLAlchemyError as e:

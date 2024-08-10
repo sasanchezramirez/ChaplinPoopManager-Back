@@ -3,7 +3,7 @@ from typing import Optional
 
 class User(BaseModel):
     id: Optional[int] = None
-    email: str
+    email: Optional[str] = None
     password: Optional[str] = None
     creation_date: Optional[str] = None
     profile_id: Optional[int] = None

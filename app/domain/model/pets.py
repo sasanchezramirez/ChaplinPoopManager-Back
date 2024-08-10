@@ -7,7 +7,7 @@ class Pet(BaseModel):
     pet_name: Optional[str] = None
     user_id: Optional[int] = None
     birthday: Optional[datetime] = None
-    profile_url: Optional[str] = None
+    profile_image: Optional[str] = None
 
 class PetList(BaseModel):
     pets: list[Pet]

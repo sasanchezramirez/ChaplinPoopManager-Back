@@ -11,10 +11,10 @@ class PetsUseCase:
     def __init__(self, persistence_gateway: PersistenceGateway):
         self.persistence_gateway = persistence_gateway
         
-    async def get_user_pets(self, pet: Pet):
+    async def get_user_pets(self, user_id: int):
         logger.info("Init get user pets usecase")
         try:  
-            pets = self.persistence_gateway.get_pets_by_user_id(pet)
+            pets = self.persistence_gateway.get_pets_by_user_id(user_id)
             return PetList(pets=pets)
         except CustomException as e:
             logger.error(f"Custom exception: {e}")

@@ -12,6 +12,7 @@ from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.usecase.pets_usecase import PetsUseCase
 from app.infrastructure.entry_point.dto.pets_dto import GetUserPetsInput, GetPetsInput
 from app.infrastructure.entry_point.mapper import pets_mapper
+from app.infrastructure.entry_point.mapper.pets_mapper import map_get_user_pets_dto_to_user
 
 logger = logging.getLogger("Poop Manager Handler")
 
@@ -30,9 +31,10 @@ router = APIRouter(
              }
 )
 @inject
-async def get_pets(
+async def get_user_pets(
     get_user_pets_dto: GetUserPetsInput,
-    pets_usecase: object = Depends(Provide[Container.pets_usecase])
+    pets_usecase: PetsUseCase = Depends(Provide[Container.pets_usecase]),
+    current_user: str = Depends(get_current_user)
 ):
     """
     Retrieves the details of a pet.
@@ -47,7 +49,8 @@ async def get_pets(
     logger.info("Init get-pets handler")
 
     try:
-        pets = await pets_usecase.get_pets(get_user_pets_dto)
+        user = map_get_user_pets_dto_to_user(get_user_pets_dto)
+        pets = await pets_usecase.get_user_pets(user.id)
         response_data = pets_mapper.map_pet_list_to_pet_list_output_dto(pets)
         return ApiResponse.create_response(ResponseCodeEnum.KO000, response_data)
     except CustomException as e:

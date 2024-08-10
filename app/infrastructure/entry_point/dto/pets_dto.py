@@ -5,7 +5,7 @@ class NewPetInput(BaseModel):
     pet_name: str
     user_id: int
     birthday: datetime
-    profile_url: str
+    profile_image: str
 
 class GetUserPetsInput(BaseModel):
     user_id: int
@@ -18,7 +18,7 @@ class PetOutput(BaseModel):
     pet_name: str
     user_id: int
     birthday: datetime
-    profile_url: str
+    profile_image: str
 
 class PetListOutput(BaseModel):
     pets: list[PetOutput]
