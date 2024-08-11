@@ -90,7 +90,7 @@ async def new_pet(
     try:
         pet = pets_mapper.map_pet_dto_to_pet(new_pet_dto)
         pet_created = await pets_usecase.new_pet(pet)
-        response_data = pets_mapper.map_pet_to_pet_output_dto(pet)
+        response_data = pets_mapper.map_pet_to_pet_output_dto(pet_created)
         return ApiResponse.create_response(ResponseCodeEnum.KO000, response_data)
     except CustomException as e:
         response_code = e.to_dict()

@@ -7,6 +7,7 @@ from app.infrastructure.driven_adapter.persistence.entity.user_entity import Use
 from app.infrastructure.driven_adapter.persistence.repository.user_repository import UserRepository
 from app.domain.model.user import User
 from app.domain.model.poop import Poop
+from app.domain.model.pets import Pet
 from app.infrastructure.driven_adapter.persistence.repository.poop_repository import PoopRepository
 from app.infrastructure.driven_adapter.persistence.mapper.poop_mapper import map_poop_to_poop_entity, map_poop_entity_to_poop
 from app.domain.gateway.persistence_gateway import PersistenceGateway
@@ -121,5 +122,21 @@ class Persistence(PersistenceGateway):
             raise e
         except SQLAlchemyError as e:
             logger.error(f"Error getting poop: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG02)
+        
+    def new_pet(self, pet: Pet):
+        try:
+            pet_entity = map_pet_to_pets_entity(pet)
+            created_pet_entity = self.pets_repository.new_pet(pet_entity)
+            logger.info(f"Created pet: {created_pet_entity.id}")
+            created_pet = map_pets_entity_to_pet(created_pet_entity)
+            self.session.commit()
+            return created_pet
+        except CustomException as e:
+            self.session.rollback()
+            raise e
+        except SQLAlchemyError as e:
+            logger.error(f"Error creating pet: {e}")
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)

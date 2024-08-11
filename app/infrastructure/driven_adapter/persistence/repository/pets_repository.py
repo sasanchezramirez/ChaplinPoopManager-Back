@@ -11,4 +11,9 @@ class PetsRepository:
     
     def get_pets_by_user_id(self, user_id: int):
        return self.session.query(PetsEntity).filter(PetsEntity.user_id == user_id).all()
-       
+    
+    def new_pet(self, pet: PetsEntity):
+            self.session.add(pet)
+            self.session.commit()
+            self.session.refresh(pet)
+            return pet

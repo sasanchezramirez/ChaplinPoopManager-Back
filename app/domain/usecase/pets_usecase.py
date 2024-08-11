@@ -26,8 +26,9 @@ class PetsUseCase:
     async def new_pet(self, pet: Pet):
         logger.info("Init new pet usecase")
         try:  
-            self.persistence_gateway.new_pet(pet)
-            return pet
+            created_pet = self.persistence_gateway.new_pet(pet)
+            logger.info(f"Created pet: {pet}")
+            return created_pet
         except CustomException as e:
             logger.error(f"Custom exception: {e}")
             raise e
