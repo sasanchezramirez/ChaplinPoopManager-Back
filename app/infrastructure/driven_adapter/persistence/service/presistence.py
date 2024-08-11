@@ -16,8 +16,8 @@ from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.util.response_codes import ResponseCodeEnum
 from app.infrastructure.driven_adapter.persistence.repository.pets_repository import PetsRepository
 from app.infrastructure.driven_adapter.persistence.mapper.pets_mapper import map_pet_to_pets_entity, map_pets_entity_to_pet
-from app.infrastructure.driven_adapter.persistence.mapper.poop_managment_mapper import map_clean_to_poop_management_entity, poop_management_entity_to_clean
-from app.infrastructure.driven_adapter.persistence.repository.poop_managment_repository import PoopManagmentRepository
+from app.infrastructure.driven_adapter.persistence.mapper.poop_management_mapper import map_clean_to_poop_management_entity, poop_management_entity_to_clean
+from app.infrastructure.driven_adapter.persistence.repository.poop_management_repository import PoopManagementRepository
 logger = logging.getLogger("Persistence")
 
 class Persistence(PersistenceGateway):
@@ -27,7 +27,7 @@ class Persistence(PersistenceGateway):
         self.user_repository = UserRepository(session)
         self.poop_repository = PoopRepository(session)
         self.pets_repository = PetsRepository(session)
-        self.poop_managment_repository = PoopManagmentRepository(session)
+        self.poop_management_repository = PoopManagementRepository(session)
 
     def create_user(self, user: User):
         try:
@@ -147,7 +147,7 @@ class Persistence(PersistenceGateway):
     def new_clean(self, clean: Clean):
         try:
             clean_entity = map_clean_to_poop_management_entity(clean)
-            created_clean_entity = self.poop_managment_repository.new_clean(clean_entity)
+            created_clean_entity = self.poop_management_repository.new_clean(clean_entity)
             self.session.commit()
             if created_clean_entity:
                 return True
