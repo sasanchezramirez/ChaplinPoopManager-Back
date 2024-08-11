@@ -8,6 +8,7 @@ from app.infrastructure.driven_adapter.persistence.repository.user_repository im
 from app.domain.model.user import User
 from app.domain.model.poop import Poop
 from app.domain.model.pets import Pet
+from app.domain.model.clean import Clean
 from app.infrastructure.driven_adapter.persistence.repository.poop_repository import PoopRepository
 from app.infrastructure.driven_adapter.persistence.mapper.poop_mapper import map_poop_to_poop_entity, map_poop_entity_to_poop
 from app.domain.gateway.persistence_gateway import PersistenceGateway
@@ -15,7 +16,8 @@ from app.domain.model.util.custom_exceptions import CustomException
 from app.domain.model.util.response_codes import ResponseCodeEnum
 from app.infrastructure.driven_adapter.persistence.repository.pets_repository import PetsRepository
 from app.infrastructure.driven_adapter.persistence.mapper.pets_mapper import map_pet_to_pets_entity, map_pets_entity_to_pet
-
+from app.infrastructure.driven_adapter.persistence.mapper.poop_managment_mapper import map_clean_to_poop_management_entity, poop_management_entity_to_clean
+from app.infrastructure.driven_adapter.persistence.repository.poop_managment_repository import PoopManagmentRepository
 logger = logging.getLogger("Persistence")
 
 class Persistence(PersistenceGateway):
@@ -25,6 +27,7 @@ class Persistence(PersistenceGateway):
         self.user_repository = UserRepository(session)
         self.poop_repository = PoopRepository(session)
         self.pets_repository = PetsRepository(session)
+        self.poop_managment_repository = PoopManagmentRepository(session)
 
     def create_user(self, user: User):
         try:
@@ -138,5 +141,37 @@ class Persistence(PersistenceGateway):
             raise e
         except SQLAlchemyError as e:
             logger.error(f"Error creating pet: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG02)
+        
+    def new_clean(self, clean: Clean):
+        try:
+            clean_entity = map_clean_to_poop_management_entity(clean)
+            created_clean_entity = self.poop_managment_repository.new_clean(clean_entity)
+            self.session.commit()
+            if created_clean_entity:
+                return True
+            else:
+                raise CustomException(ResponseCodeEnum.KOG02)
+        except CustomException as e:
+            self.session.rollback()
+            raise e
+        except SQLAlchemyError as e:
+            logger.error(f"Error creating clean: {e}")
+            self.session.rollback()
+            raise CustomException(ResponseCodeEnum.KOG02)
+        
+    def get_clean_by_pet_id(self, clean: Clean):
+        try:
+            clean_list = []
+            clean_entity = map_clean_to_poop_management_entity(clean)
+            clean_list_entity = self.poop_managment_repository.get_clean_by_pet_id(clean_entity)
+            for clean_entity in clean_list_entity:
+                clean_list.append(poop_management_entity_to_clean(clean_entity))
+            return clean_list
+        except CustomException as e:
+            raise e
+        except SQLAlchemyError as e:
+            logger.error(f"Error getting clean: {e}")
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
