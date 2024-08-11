@@ -32,3 +32,7 @@ class PersistenceGateway(ABC):
     @abstractmethod
     def get_pets_by_user_id(self, user_id: int):
         pass
+
+    @abstractmethod
+    def new_pet(self, pet: Pet):
+        pass

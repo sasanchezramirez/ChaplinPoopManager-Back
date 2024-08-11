@@ -22,3 +22,15 @@ class PetsUseCase:
         except Exception as e:
             logger.error(f"Unhandled error: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
+        
+    async def new_pet(self, pet: Pet):
+        logger.info("Init new pet usecase")
+        try:  
+            self.persistence_gateway.new_pet(pet)
+            return pet
+        except CustomException as e:
+            logger.error(f"Custom exception: {e}")
+            raise e
+        except Exception as e:
+            logger.error(f"Unhandled error: {e}")
+            raise CustomException(ResponseCodeEnum.KOG01)
