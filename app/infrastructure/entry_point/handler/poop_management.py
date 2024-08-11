@@ -11,7 +11,7 @@ from app.domain.usecase.util.jwt import get_current_user
 from app.domain.model.util.response_codes import ResponseCodeEnum
 from app.infrastructure.entry_point.dto.response_dto import ResponseDTO
 from app.infrastructure.entry_point.utils.api_response import ApiResponse
-from app.infrastructure.entry_point.mapper.clean_mapper import map_clean_to_clean_dto, map_clean_list_to_clean_list_output_dto, map_clean_dto_to_clean
+from app.infrastructure.entry_point.mapper.clean_mapper import map_get_clean_input_to_clean, map_clean_list_to_clean_list_output_dto, map_clean_dto_to_clean
 from app.domain.usecase.clean_usecase import CleanUseCase
 
 logger = logging.getLogger("Poop Management Handler")
@@ -32,7 +32,8 @@ router = APIRouter(
 @inject
 async def new_clean(
     new_clean_dto: NewCleanInput,
-    clean_usecase: CleanUseCase = Depends(Provide[Container.clean_usecase])
+    clean_usecase: CleanUseCase = Depends(Provide[Container.clean_usecase]),
+    current_user: str = Depends(get_current_user)
 ):
     """
     Puts a new clean in the system.
@@ -60,5 +61,41 @@ async def new_clean(
         response_code = ApiResponse.create_response(ResponseCodeEnum.KOG01)
         return JSONResponse(status_code=500, content=response_code)
     
-
-
+@router.post('/get-clean', 
+    response_model=ResponseDTO,
+    responses={
+        200: {"description": "Operation successful", "model": ResponseDTO},
+        400: {"description": "Validation Error", "model": ResponseDTO},
+        500: {"description": "Internal Server Error", "model": ResponseDTO},
+    }
+)    
+@inject
+async def get_clean(
+    get_clean_input: GetCleanInput,
+    clean_usecase: CleanUseCase = Depends(Provide[Container.clean_usecase]),
+    current_user: str = Depends(get_current_user)
+):
+    """
+    Gets a clean from the system.
+    
+    Args:
+        get_clean_input (GetCleanInput): The data transfer object containing the clean's details.
+        # poop_usecase (PoopUseCase): The Poop UseCase.
+    
+    Returns:
+        ResponseDTO: A response object containing the operation data.
+    """
+    
+    logger.info("Init get-clean handler")
+    
+    try:
+        clean = await clean_usecase.get_clean(get_clean_input.pet_id)
+        response_data = map_clean_list_to_clean_list_output_dto(clean)
+        return ApiResponse.create_response(ResponseCodeEnum.KO000, response_data)
+    except CustomException as e:
+        response_code = e.to_dict()
+        return JSONResponse(status_code=e.http_status, content=response_code)
+    except Exception as e:
+        logger.error(f"Unhandled exception: {e}")
+        response_code = ApiResponse.create_response(ResponseCodeEnum.KOG01)
+        return JSONResponse(status_code=500, content=response_code)

@@ -1,19 +1,18 @@
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import date
 
 class NewCleanInput(BaseModel):
     pet_id: int
 
 
 class GetCleanInput(BaseModel):
-    id: int
     pet_id: int
-    date_of_clean: datetime
+
 
 class CleanOutput(BaseModel):
     id: int
     pet_id: int
-    date_of_clean: datetime
+    date_of_clean: date
 
 class CleanListOutput(BaseModel):
     cleans: list[CleanOutput]

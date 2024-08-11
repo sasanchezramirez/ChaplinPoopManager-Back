@@ -41,3 +41,7 @@ class PersistenceGateway(ABC):
     @abstractmethod
     def new_clean(self, clean: Clean):
         pass
+
+    @abstractmethod
+    def get_clean_by_pet_id(self, pet_id: int):
+        pass

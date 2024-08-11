@@ -18,8 +18,8 @@ class PoopManagementRepository:
         return poop_management_entity
 
         
-    def get_clean_by_pet_id(self, poop_management_entity: PoopManagementEntity):
-        return self.session.query(PoopManagementEntity).filter(PoopManagementEntity.pet_id == poop_management_entity.pet_id).all()
+    def get_clean_by_pet_id(self, pet_id: int):
+        return self.session.query(PoopManagementEntity).filter(PoopManagementEntity.pet_id == pet_id).all()
 
         
 

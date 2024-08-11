@@ -27,12 +27,11 @@ class CleanUseCase:
             logger.error(f"Unhandled error: {e}")
             raise CustomException(ResponseCodeEnum.KOG01)
         
-    async def get_clean(self, clean: Clean):
+    async def get_clean(self, pet_id: int):
         logger.info("Init get clean usecase")
         try:  
-            clean_times = self.persistence_gateway.get_clean_by_pet_id(clean)
-            clean_list = CleanList(cleans=clean_times)
-            return clean_list
+            clean_list= self.persistence_gateway.get_clean_by_pet_id(pet_id)
+            return CleanList(cleans=clean_list)
         except CustomException as e:
             logger.error(f"Custom exception: {e}")
             raise e

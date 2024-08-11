@@ -161,13 +161,13 @@ class Persistence(PersistenceGateway):
             self.session.rollback()
             raise CustomException(ResponseCodeEnum.KOG02)
         
-    def get_clean_by_pet_id(self, clean: Clean):
+    def get_clean_by_pet_id(self, pet_id: int):
         try:
             clean_list = []
-            clean_entity = map_clean_to_poop_management_entity(clean)
-            clean_list_entity = self.poop_managment_repository.get_clean_by_pet_id(clean_entity)
+            clean_list_entity = self.poop_management_repository.get_clean_by_pet_id(pet_id)
             for clean_entity in clean_list_entity:
                 clean_list.append(poop_management_entity_to_clean(clean_entity))
+            print(clean_list)
             return clean_list
         except CustomException as e:
             raise e
