@@ -12,11 +12,4 @@ class User_entity(Base):
     status_id = Column(Integer)
     
 
-    def __init__(self, user):
-        self.email = user.email
-        self.password = user.password
-        self.creation_date = user.creation_date
-        self.profile_id = user.profile_id
-        self.status_id = user.status_id
-
 

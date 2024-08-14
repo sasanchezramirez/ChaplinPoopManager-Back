@@ -2,7 +2,7 @@ import logging
 import app.infrastructure.driven_adapter.persistence.mapper.user_mapper as mapper
 
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from app.infrastructure.driven_adapter.persistence.entity.user_entity import User_entity
 from app.infrastructure.driven_adapter.persistence.repository.user_repository import UserRepository
 from app.domain.model.user import User
@@ -35,13 +35,22 @@ class Persistence(PersistenceGateway):
             created_user_entity = self.user_repository.create_user(user_entity)
             self.session.commit()
             return mapper.map_user_entity_to_user(created_user_entity)
-        except CustomException as e:
-            self.session.rollback()
-            raise e
-        except SQLAlchemyError as e:
-            logger.error(f"Error creating user: {e}")
-            self.session.rollback()
+        except IntegrityError as e:
+            logger.error(f"Operation failed: {e}")
+            if "llave duplicada" or "duplicate key" in str(e.orig):
+                raise CustomException(ResponseCodeEnum.KOU01)
+            elif "viola la llave" or "key violation" in str(e.orig):
+                if "profile_id" in str(e.orig):
+                    raise CustomException(ResponseCodeEnum.KOU03)
+                elif "status_id" in str(e.orig):
+                    raise CustomException(ResponseCodeEnum.KOU04)
             raise CustomException(ResponseCodeEnum.KOG02)
+        except SQLAlchemyError as e:
+            logger.error(f"Operation failed: {e}")
+            raise CustomException(ResponseCodeEnum.KOG02)
+        except Exception as e:
+            logger.error(f"Operation failed: {e}")
+            raise CustomException(ResponseCodeEnum.KOG01)
         
     def get_user_by_id(self, id: int):
         try:
@@ -50,9 +59,11 @@ class Persistence(PersistenceGateway):
         except CustomException as e:
             raise e
         except SQLAlchemyError as e:
-            logger.error(f"Error getting user: {e}")
-            self.session.rollback()
+            logger.error(f"Operation failed: {e}")
             raise CustomException(ResponseCodeEnum.KOG02)
+        except Exception as e:
+            logger.error(f"Operation failed: {e}")  
+            raise CustomException(ResponseCodeEnum.KOG01)
         
     def get_user_by_email(self, email: str):
         try:
@@ -61,26 +72,47 @@ class Persistence(PersistenceGateway):
         except CustomException as e:
             raise e
         except SQLAlchemyError as e:
-            logger.error(f"Error getting user: {e}")
-            self.session.rollback()
+            logger.error(f"Operation failed: {e}")
             raise CustomException(ResponseCodeEnum.KOG02)
+        except Exception as e:
+            logger.error(f"Operation failed: {e}")
+            raise CustomException(ResponseCodeEnum.KOG01)
     
     def update_user(self, user: User):
         try:
-            existing_user = self.user_repository.get_user_by_id(user.id)
+            user_entity = mapper.map_user_update_to_user_entity(user)
+            existing_user = self.user_repository.get_user_by_id(user_entity.id)
             if not existing_user:
-                raise CustomException(ResponseCodeEnum.KOU02)
+                raise CustomException(ResponseCodeEnum.KOD02)
+
+            if user_entity.email:
+                existing_user.email = user_entity.email
+            if user_entity.password:
+                existing_user.password = user_entity.password
+            if user_entity.profile_id is not None and user_entity.profile_id != 0:
+                existing_user.profile_id = user_entity.profile_id
+            if user_entity.status_id is not None and user_entity.status_id != 0:
+                existing_user.status_id = user_entity.status_id
             user_entity = mapper.map_user_update_to_user_entity(user, existing_user)
             updated_user_entity = self.user_repository.update_user(user_entity)
             self.session.commit()
             return mapper.map_user_entity_to_user(updated_user_entity)
-        except CustomException as e:
-            self.session.rollback()
-            raise e
-        except SQLAlchemyError as e:
-            logger.error(f"Error updating user: {e}")
-            self.session.rollback()
+        except IntegrityError as e:
+            logger.error(f"Operation failed: {e}")
+            if "llave duplicada" in str(e.orig) or "duplicate key" in str(e.orig):
+                raise CustomException(ResponseCodeEnum.KOU01)
+            elif "viola la llave" in str(e.orig) or "key violation" in str(e.orig):
+                if "profile_id" in str(e.orig):
+                    raise CustomException(ResponseCodeEnum.KOU03)
+                elif "status_id" in str(e.orig):
+                    raise CustomException(ResponseCodeEnum.KOU04)
             raise CustomException(ResponseCodeEnum.KOG02)
+        except SQLAlchemyError as e:
+            logger.error(f"Operation failed: {e}")
+            raise CustomException(ResponseCodeEnum.KOG02)
+        except Exception as e:
+            logger.error(f"Operation failed: {e}")
+            raise CustomException(ResponseCodeEnum.KOG01)
     
     def new_poop(self, poop: Poop):
         try:
