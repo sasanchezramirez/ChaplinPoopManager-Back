@@ -3,8 +3,8 @@ import app.infrastructure.driven_adapter.persistence.mapper.user_mapper as mappe
 
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
-from app.infrastructure.driven_adapter.persistence.entity.user_entity import User_entity
 from app.infrastructure.driven_adapter.persistence.repository.user_repository import UserRepository
+from app.infrastructure.driven_adapter.persistence.entity.user_entity import UserEntity
 from app.domain.model.user import User
 from app.domain.model.poop import Poop
 from app.domain.model.pets import Pet
@@ -31,12 +31,7 @@ class Persistence(PersistenceGateway):
 
     def create_user(self, user: User):
         try:
-            user_entity = User_entity()
-            user_entity.email = user.email
-            user_entity.password = user.password
-            user_entity.creation_date = user.creation_date
-            user_entity.profile_id = user.profile_id
-            user_entity.status_id = user.status_id
+            user_entity = mapper.map_user_to_user_entity(user)
             created_user_entity = self.user_repository.create_user(user_entity)
             self.session.commit()
             return mapper.map_user_entity_to_user(created_user_entity)
@@ -85,19 +80,10 @@ class Persistence(PersistenceGateway):
     
     def update_user(self, user: User):
         try:
-            user_entity = mapper.map_user_update_to_user_entity(user)
-            existing_user = self.user_repository.get_user_by_id(user_entity.id)
+            existing_user = self.user_repository.get_user_by_id(user.id)
             if not existing_user:
                 raise CustomException(ResponseCodeEnum.KOD02)
 
-            if user_entity.email:
-                existing_user.email = user_entity.email
-            if user_entity.password:
-                existing_user.password = user_entity.password
-            if user_entity.profile_id is not None and user_entity.profile_id != 0:
-                existing_user.profile_id = user_entity.profile_id
-            if user_entity.status_id is not None and user_entity.status_id != 0:
-                existing_user.status_id = user_entity.status_id
             user_entity = mapper.map_user_update_to_user_entity(user, existing_user)
             updated_user_entity = self.user_repository.update_user(user_entity)
             self.session.commit()

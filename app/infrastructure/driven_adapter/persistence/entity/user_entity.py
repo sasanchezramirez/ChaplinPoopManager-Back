@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String
 from app.infrastructure.driven_adapter.persistence.config.database import Base
 
 
-class User_entity(Base):
+class UserEntity(Base):
     __tablename__ = "users"
     __table_args__ = {'schema': 'poop_manager'}
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
