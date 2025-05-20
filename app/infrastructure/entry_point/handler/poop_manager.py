@@ -39,7 +39,7 @@ async def new_poop(
     
     Args:
         new_poop_dto (NewPoopInput): The data transfer object containing the poop's details.
-        # poop_usecase (PoopUseCase): The Poop UseCase.
+        poop_usecase (PoopUseCase): The Poop UseCase.
 
     Returns:
         ResponseDTO: A response object containing the operation data.

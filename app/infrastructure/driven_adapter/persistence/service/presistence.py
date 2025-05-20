@@ -31,7 +31,12 @@ class Persistence(PersistenceGateway):
 
     def create_user(self, user: User):
         try:
-            user_entity = User_entity(user)
+            user_entity = User_entity()
+            user_entity.email = user.email
+            user_entity.password = user.password
+            user_entity.creation_date = user.creation_date
+            user_entity.profile_id = user.profile_id
+            user_entity.status_id = user.status_id
             created_user_entity = self.user_repository.create_user(user_entity)
             self.session.commit()
             return mapper.map_user_entity_to_user(created_user_entity)
