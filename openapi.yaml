@@ -3,8 +3,7 @@ openapi: 3.0.3
 info:
   title: ChaplinPoopManager
   description: |-
-    Esta es la comunicacion entre el backend del gestor del arenero con el front y 
-    el sensor.
+    This is the contract for the communication between backend and front or sensors
   version: 1.0.0
   contact:
     name: Santiago Sanchez
@@ -15,21 +14,18 @@ info:
 
 servers:
   - url: https://render.com/v1
-    description: Servidor de Producción
+    description: Production Server
 
 
-# Las etiquetas (tags) se usan para agrupar las operaciones (endpoints).
-# Facilita la navegación en la documentación.
+
 tags:
   - name: HealthCheck
-  - name: Usuarios
-    description: Operaciones relacionadas con los usuarios
-  - name: Productos
-    description: Operaciones para la gestión de productos
+  - name: Auth
+    description: Services related to users
+  - name: Pets
+    description: Services related to users
 
-# Aquí es donde defines todos tus endpoints (rutas) y los métodos HTTP.
 paths:
-  # Ruta para obtener una lista de recursos o crear uno nuevo.
   /healtch-check:
     get:
       tags:
@@ -50,14 +46,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /usuarios:
-    get:
+  /auth/create-user:
+    post:
       tags:
-        - Usuarios
-      summary: Obtener una lista de usuarios
-      description: Devuelve una lista paginada de todos los usuarios registrados.
-      operationId: getUsuarios
-      # Parámetros que se pueden enviar en la solicitud (query params, headers, etc.).
+        - Auth
+      summary: Create a user
+      description: Create a user on database. Returns the user
+      operationId: createUser
       parameters:
         - name: limite
           in: query
