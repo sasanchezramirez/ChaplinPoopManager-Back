@@ -1,0 +1,163 @@
+openapi: 3.0.3
+
+info:
+  title: ChaplinPoopManager
+  description: |-
+    Esta es la comunicacion entre el backend del gestor del arenero con el front y 
+    el sensor.
+  version: 1.0.0
+  contact:
+    name: Santiago Sanchez
+    url: gaugelife.co
+    email: email.gaugelife@gmail.com
+
+
+
+servers:
+  - url: https://render.com/v1
+    description: Servidor de Producción
+
+
+# Las etiquetas (tags) se usan para agrupar las operaciones (endpoints).
+# Facilita la navegación en la documentación.
+tags:
+  - name: HealthCheck
+  - name: Usuarios
+    description: Operaciones relacionadas con los usuarios
+  - name: Productos
+    description: Operaciones para la gestión de productos
+
+# Aquí es donde defines todos tus endpoints (rutas) y los métodos HTTP.
+paths:
+  # Ruta para obtener una lista de recursos o crear uno nuevo.
+  /healtch-check:
+    get:
+      tags:
+        - HealthCheck
+      summary: Validates that the service is running.
+      description: Responds a life check of the service
+      operationId: getHealthCheck
+      responses:
+        '200':
+          description: Service is running
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArregloUsuarios'
+        '500':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /usuarios:
+    get:
+      tags:
+        - Usuarios
+      summary: Obtener una lista de usuarios
+      description: Devuelve una lista paginada de todos los usuarios registrados.
+      operationId: getUsuarios
+      # Parámetros que se pueden enviar en la solicitud (query params, headers, etc.).
+      parameters:
+        - name: limite
+          in: query
+          description: Número máximo de usuarios a devolver
+          required: false
+          schema:
+            type: integer
+            format: int32
+      # Las posibles respuestas de la operación.
+      responses:
+        '200':
+          description: Operación exitosa. Devuelve una lista de usuarios.
+          content:
+            application/json:
+              schema:
+                # Referencia a un componente reutilizable.
+                $ref: '#/components/schemas/ArregloUsuarios'
+        '500':
+          description: Error interno del servidor.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # Ruta para operaciones sobre un recurso específico, identificado por un ID.
+  /usuarios/{usuarioId}:
+    get:
+      tags:
+        - Usuarios
+      summary: Obtener un usuario por su ID
+      description: Devuelve los detalles de un usuario específico.
+      operationId: getUsuarioPorId
+      parameters:
+        - name: usuarioId
+          # El parámetro está en la ruta (path).
+          in: path
+          description: ID del usuario a obtener
+          required: true
+          schema:
+            type: string
+            format: uuid # o integer, dependiendo de tu sistema
+      responses:
+        '200':
+          description: Usuario encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '404':
+          description: Usuario no encontrado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+# Componentes reutilizables. Esto ayuda a mantener tu especificación limpia y organizada (DRY).
+components:
+  # Esquemas de datos (modelos).
+  schemas:
+    Usuario:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: El identificador único del usuario.
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        nombre:
+          type: string
+          example: 'Juan'
+        apellido:
+          type: string
+          example: 'Pérez'
+        email:
+          type: string
+          format: email
+          example: 'juan.perez@email.com'
+    ArregloUsuarios:
+      type: array
+      items:
+        $ref: '#/components/schemas/Usuario'
+    Error:
+      type: object
+      properties:
+        codigo:
+          type: integer
+          example: 404
+        mensaje:
+          type: string
+          example: 'Recurso no encontrado.'
+
+  # Esquemas de seguridad.
+  securitySchemes:
+    # Ejemplo de autenticación con Bearer Token (JWT).
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+# Define qué esquemas de seguridad se aplican globalmente a toda la API.
+# También se puede aplicar a operaciones específicas.
+security:
+  - bearerAuth: []
